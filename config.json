@@ -1,0 +1,131 @@
+{
+    "model_examples": {
+      "Vision Models": [
+        ["google/paligemma-3b-mix-224"],
+        ["google/paligemma-3b-ft-refcoco-seg-224"],
+        ["llava-hf/llava-v1.6-mistral-7b-hf"],
+        ["xtuner/llava-phi-3-mini-hf"],
+        ["xtuner/llava-llama-3-8b-v1_1-transformers"],
+        ["vikhyatk/moondream2"],
+        ["openbmb/MiniCPM-Llama3-V-2_5"],
+        ["microsoft/Phi-3-vision-128k-instruct"],
+        ["HuggingFaceM4/idefics2-8b-chatty"],
+        ["microsoft/llava-med-v1.5-mistral-7b"]
+      ],
+      "Other Models": [
+        ["dwb2023/mistral-7b-instruct-quantized"],
+        ["mistralai/Mistral-7B-Instruct-v0.2"],
+        ["mistralai/Mistral-7B-Instruct-v0.3"],
+        ["google/gemma-7b"],
+        ["microsoft/Phi-3-mini-4k-instruct"],
+        ["meta-llama/Meta-Llama-3-8B"]
+      ]
+    },
+    "datasets": {
+      "imdb": {
+        "path": "imdb",
+        "columns": {
+          "text": "text",
+          "label": "label"
+        },
+        "preparation": {
+          "type": "text_classification",
+          "prompt_prefix": "Write a movie review: ",
+          "prompt_length": 100
+        }
+      },
+      "samsum": {
+        "path": "samsum",
+        "columns": {
+          "dialogue": "prompt",
+          "summary": "completion"
+        },
+        "preparation": {
+          "type": "summarization"
+        }
+      },
+      "xsum": {
+        "path": "xsum",
+        "columns": {
+          "document": "prompt",
+          "summary": "completion"
+        },
+        "preparation": {
+          "type": "summarization"
+        }
+      }
+    },
+    "fine_tuning_methods": {
+      "SFT": {
+        "class": "SFTMethod",
+        "trainer": "SFTTrainer",
+        "config": "SFTConfig",
+        "output_dir": "sft_model",
+        "learning_rate": 1e-5,
+        "epochs": 3,
+        "lora_r": 8,
+        "lora_alpha": 32,
+        "lora_dropout": 0.1
+      },
+      "DPO": {
+        "class": "DPOMethod",
+        "trainer": "DPOTrainer",
+        "config": "DPOConfig",
+        "output_dir": "dpo_model",
+        "learning_rate": 1e-5,
+        "epochs": 3,
+        "beta": 0.1,
+        "lora_r": 8,
+        "lora_alpha": 32,
+        "lora_dropout": 0.1,
+        "reward_model_name": "facebook/bart-large-mnli" // Example Reward Model
+      },
+      "PPO": {
+        "class": "PPOMethod",
+        "trainer": "PPOTrainer",
+        "config": "PPOConfig",
+        "output_dir": "ppo_model",
+        "learning_rate": 1e-5,
+        "epochs": 3,
+        "reward_model_name": "facebook/bart-large-mnli", // Example Reward Model
+        "lora_r": 8,
+        "lora_alpha": 32,
+        "lora_dropout": 0.1
+      }
+    },
+    "evaluation_metrics": {
+      "Accuracy": {
+        "class": "AccuracyMetric",
+        "metric_name": "accuracy"
+      },
+      "Perplexity": {
+        "class": "PerplexityMetric",
+        "metric_name": "perplexity"
+      },
+      "ROUGE": {
+        "class": "RougeMetric",
+        "metric_name": "rouge"
+      }
+    },
+    "tokenization_strategies": {
+      "default": {
+        "description": "Default tokenization using the model's tokenizer"
+      },
+      "custom": {
+        "description": "Use a custom tokenization function",
+        "max_input_length": 512,
+        "max_output_length": 128
+      }
+    },
+    "collation_strategies": {
+      "default": {
+        "description": "Default collation using the transformers library"
+      },
+      "seq2seq": {
+        "description": "Collation for Seq2Seq models using the transformers library"
+      },
+      "custom": {
+        "description": "Use a custom collation function"
+      }
+    }
+  }
